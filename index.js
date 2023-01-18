@@ -18,14 +18,15 @@ switch (query.data){
     case 'Yes':
        
         bot.sendMessage(chat.id, 'Какие на сегодня задачи?')
-//        bot.forwardMessage(chat.id, куда, message_id)
+//        bot.forwardMessage(chat.id, Куда, message_id)
         break
     case 'No':
  
         bot.sendMessage(chat.       id, 'А почему?')
-//        bot.forwardMessage(chat.id, куда, message_id)  
+//        bot.forwardMessage(chat.id, Куда, message_id)  
         break     
 }
+
 
 bot.answerCallbackQuery({
     callback_query_id: query.id
