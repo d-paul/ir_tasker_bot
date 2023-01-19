@@ -2,7 +2,7 @@ const kb = require('./keyboard_button')
 
 
 module.exports = {
-    tel: [
+    tel:{} [
         [kb.sendTel.phone]
         ],
     adm:[
