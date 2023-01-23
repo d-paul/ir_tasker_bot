@@ -1,1 +1,1 @@
-ir-tasker-bot dev
+ir-tasker-bot dev test
