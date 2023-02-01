@@ -1,36 +1,24 @@
 const TelegramBot = require('node-telegram-bot-api')
 const { Query } = require('pg')
 const { json } = require('stream/consumers')
-const helpers = require('./helpers')
 const { getChatId } = require('./helpers')
-
 const token = '5703563310:AAE0tmQJfBQ1zFJxlRy_u9fpo65Dne9dhrM'
-const debug = require('./helpers')
-const keyboard =require('./keyboard')
-const kb = require('./keyboard_button')
+
+//const debug = require('./helpers')
+//const keyboard =require('./keyboard')
+//const kb = require('./keyboard_button')
+//const { tel } = require('./keyboard')
+//const helpers = require('./helpers')
 
 const sequelize = require('./db')
 const personalModel = require('./models')
-const { tel } = require('./keyboard')
 const personal = require('./models')
 const { Op } = require('sequelize')
+const cron = require('node-cron')
 
 
-console.log('bot has been started')
-
+console.log('bot has been started . . .')
 const bot = new TelegramBot(token, { polling: true})
-
-
-
-
-/*bot.on('message', msg => {
-    switch(msg.text){
-        case kb.sendTel.phone:
-            break
-    } 
-})*/
- 
-
 
 
 
@@ -51,10 +39,10 @@ const reqPhone = {
         ]
     }
 }
-bot.sendMessage(helpers.getChatId(msg), text, reqPhone)
+bot.sendMessage(getChatId(msg), text, reqPhone)
    
 try{
-sequelize.authenticate(
+sequelize.authenticate( 
 sequelize.sync(),
 console.log('db  in')
 )
@@ -79,14 +67,14 @@ const isIdUnique = number_phone =>
     
     isIdUnique(telUser).then(isUnique => {
         if (isUnique) {
-            bot.sendMessage(helpers.getChatId(msg), 'Вы можете начать работать с ботом')
+            bot.sendMessage(getChatId(msg), 'Вы можете начать работать с ботом')
 
             isIdUniqueAccess(1).then(isIdUniqueAccess => {
                     if (isIdUniqueAccess) {
-                        bot.sendMessage(helpers.getChatId(msg), '1')
+                        bot.sendMessage(getChatId(msg), '1')
                     }
                     else{
-                        bot.sendMessage(helpers.getChatId(msg), 'Введите пароль:')
+                        bot.sendMessage(getChatId(msg), 'Введите пароль:')
 
                        bot.once('message', (msg) =>{
                             const pass = msg.text
@@ -101,14 +89,14 @@ const isIdUnique = number_phone =>
                         })
                         
                         bot.once('message', (msg) =>{
-                         bot.sendMessage(helpers.getChatId(msg),' Пароль установлен ')   
+                         bot.sendMessage(getChatId(msg),' Пароль установлен ')   
                         }) 
                         
                     }
                 })
         }
         else{
-            bot.sendMessage(helpers.getChatId(msg), 'Вас нет в списке, обратьтесь к администратору')
+            bot.sendMessage(getChatId(msg), 'Вас нет в списке, обратьтесь к администратору')
         }
     })
 }
