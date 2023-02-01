@@ -51,10 +51,10 @@ console.log('db  in')
 })
  
 bot.once('contact',  msg=>{
-
+const telUser = msg.contact.phone_number  
 function check(){
 
-    const telUser = msg.contact.phone_number  
+    
     
 const isIdUnique = number_phone =>
   personalModel.findOne({ where: { number_phone} , attributes: ['personal_id'] })
@@ -74,7 +74,7 @@ const isIdUnique = number_phone =>
                         bot.sendMessage(getChatId(msg), '1')
                     }
                     else{
-                        bot.sendMessage(getChatId(msg), 'Введите пароль:')
+                        bot.sendMessage(getChatId(msg), 'Установите пароль:')
 
                        bot.once('message', (msg) =>{
                             const pass = msg.text
@@ -101,6 +101,62 @@ const isIdUnique = number_phone =>
     })
 }
 check()
+bot.on('message', (msg)=>{
+cron.schedule('0 10 * * 1-5', () =>{
+    
+
+   
+    const morning = {
+        reply_markup: {
+            one_time_keyboard: true,
+            keyboard: [
+                [
+                    'Ввести план на день'                                                       
+                ],
+                [
+                    'Сегодня не работаю'                    
+                ]
+            ]
+        }
+    }
+    bot.sendMessage(getChatId(msg),'Доброе утро! Что на сегодня запланировано?', morning)
+   
+     })
+if (msg.text === 'Ввести план на день'){
+        
+          bot.sendMessage(getChatId(msg), 'Жду',)   
+          
+          bot.once('message', (msg) =>{
+            var tasks = msg.text
+            
+            sequelize.query("UPDATE personals SET tasks = $2 WHERE number_phone = $1", {
+            bind:[telUser,tasks],
+            model: personal,
+            mapToModel: true,
+            type: Op.SELECT,
+          })
+        
+        })
+
+    }
+
+else if (msg.text === 'Сегодня не работаю'){
+    bot.sendMessage(getChatId(msg), 'Введите причину',) 
+    bot.once('message', (msg) =>{
+        var tasks = 'Не работает, т.к: ' + msg.text
+        
+        sequelize.query("UPDATE personals SET tasks = $2 WHERE number_phone = $1", {
+        bind:[telUser,tasks],
+        model: personal,
+        mapToModel: true,
+        type: Op.SELECT,
+      })
+    
+    })
+}
+
+})
+ 
 })
 
 

@@ -41,6 +41,9 @@ const personal = sequelize.define('personal',
     password:{
         type: DataTypes.CHAR(50),
         
+    },
+    tasks:{
+        type: DataTypes.CHAR(1000)
     }
 }
 )
