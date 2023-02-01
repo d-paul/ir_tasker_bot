@@ -40,7 +40,7 @@ const personal = sequelize.define('personal',
     },
     password:{
         type: DataTypes.CHAR(50),
-        allowNull: false
+        
     }
 }
 )

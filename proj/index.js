@@ -13,7 +13,7 @@ const sequelize = require('./db')
 const personalModel = require('./models')
 const { tel } = require('./keyboard')
 const personal = require('./models')
-
+const { Op } = require('sequelize')
 
 
 console.log('bot has been started')
@@ -53,42 +53,72 @@ const reqPhone = {
 }
 bot.sendMessage(helpers.getChatId(msg), text, reqPhone)
    
-
-
 try{
 sequelize.authenticate(
 sequelize.sync(),
 console.log('db  in')
 )
 
-
-} catch (e) {
-    console.log('db  errors')
-}
-
+} catch (e) { console.log('db  errors')}
 })
  
-bot.on('contact', (msg)=>{
+bot.once('contact',  msg=>{
+
+function check(){
+
     const telUser = msg.contact.phone_number  
     
-    
-   
-    
-    isIdUnique(telUser).then(isUnique => {
-        if (isUnique) {
-            bot.sendMessage(helpers.getChatId(msg), 'Вы можете начать работать с ботом')
-        }
-        else{
-            bot.sendMessage(helpers.getChatId(msg), 'Вас нет в списке, обратьтесь к администратору')
-        }
-    })
-     
-})
-
 const isIdUnique = number_phone =>
   personalModel.findOne({ where: { number_phone} , attributes: ['personal_id'] })
     .then(token => token !== null)
     .then(isUnique => isUnique);
 
+    const isIdUniqueAccess = access_level =>
+  personalModel.findOne({ where: { [Op.and]: [{access_level},{number_phone:telUser}] } , attributes: ['personal_id'] })  
+    .then(isIdUniqueAccess => isIdUniqueAccess);
+    
+    isIdUnique(telUser).then(isUnique => {
+        if (isUnique) {
+            bot.sendMessage(helpers.getChatId(msg), 'Вы можете начать работать с ботом')
 
+            isIdUniqueAccess(1).then(isIdUniqueAccess => {
+                    if (isIdUniqueAccess) {
+                        bot.sendMessage(helpers.getChatId(msg), '1')
+                    }
+                    else{
+                        bot.sendMessage(helpers.getChatId(msg), 'Введите пароль:')
+
+                       bot.once('message', (msg) =>{
+                            const pass = msg.text
+                            
+                        sequelize.query("UPDATE personals SET password = $2 WHERE number_phone = $1", {
+                            bind:[telUser,pass],
+                            model: personal,
+                            mapToModel: true,
+                            type: Op.SELECT,
+                          })
+                        
+                        })
+                        
+                        bot.once('message', (msg) =>{
+                         bot.sendMessage(helpers.getChatId(msg),' Пароль установлен ')   
+                        }) 
+                        
+                    }
+                })
+        }
+        else{
+            bot.sendMessage(helpers.getChatId(msg), 'Вас нет в списке, обратьтесь к администратору')
+        }
+    })
+}
+check()
+})
+
+
+
+
+
+
+   
   
