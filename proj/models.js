@@ -44,6 +44,9 @@ const personal = sequelize.define('personal',
     },
     tasks:{
         type: DataTypes.CHAR(1000)
+    },
+    fact:{
+        type: DataTypes.CHAR(1000)
     }
 }
 )
