@@ -5,9 +5,6 @@ const { getChatId } = require('./helpers')
 const token = '5703563310:AAE0tmQJfBQ1zFJxlRy_u9fpo65Dne9dhrM'
 
 //const debug = require('./helpers')
-//const keyboard =require('./keyboard')
-//const kb = require('./keyboard_button')
-//const { tel } = require('./keyboard')
 //const helpers = require('./helpers')
 
 const sequelize = require('./db')
@@ -16,7 +13,7 @@ const personal = require('./models')
 const { Op } = require('sequelize')
 const cron = require('node-cron')
 const { query } = require('./db')
-
+const webAppUrl = 'https://ya.ru'
 
 console.log('bot has been started . . .')
 const bot = new TelegramBot(token, { polling: true})
@@ -57,12 +54,12 @@ bot.once('contact',  msg=>{
     function check(){
  
         const isIdUnique = number_phone =>
-            personalModel.findOne({ where: { number_phone} , attributes: ['personal_id'] })
+            personalModel.findOne({ where: { number_phone} , attributes: ['number_phone'] })
             .then(token => token !== null)
             .then(isUnique => isUnique);
 
         const isIdUniqueAccess = access_level =>
-            personalModel.findOne({ where: { [Op.and]: [{access_level},{number_phone:telUser}] } , attributes: ['personal_id'] })  
+            personalModel.findOne({ where: { [Op.and]: [{access_level},{number_phone:telUser}] } , attributes: ['number_phone'] })  
             .then(isIdUniqueAccess => isIdUniqueAccess);
     
         isIdUnique(telUser).then(isUnique => {
@@ -100,7 +97,7 @@ bot.once('contact',  msg=>{
     check()
 
     bot.once('message', (msg)=>{
-        cron.schedule('0 10 * * 1-5', () =>{
+        cron.schedule('0-35 15 * * 1-5', () =>{
 
             const morning = {
         reply_markup: {
@@ -139,10 +136,10 @@ bot.once('contact',  msg=>{
             else if (query.data === 'Сегодня не работаю'){
                 bot.sendMessage(getChatId(msg), 'Введите причину',) 
                 bot.once('message', (msg) =>{
-                    var tasks = 'Не работает, т.к: ' + msg.text
+                    this.tasks = 'Не работает, т.к: ' + msg.text
         
                     sequelize.query("UPDATE personals SET tasks = $2 WHERE number_phone = $1", {
-                        bind:[telUser,tasks],
+                        bind:[telUser,this.tasks],
                         model: personal,
                         mapToModel: true,
                         type: Op.SELECT,
@@ -155,7 +152,7 @@ bot.once('contact',  msg=>{
 
 
     bot.once('message', (msg)=>{
-        cron.schedule('0-59 10-19 * * 1-5', () =>{
+        cron.schedule('11 18 * * 1-5', () =>{
              
             const evening = {
             reply_markup: {
@@ -174,7 +171,7 @@ bot.once('contact',  msg=>{
             bot.sendMessage(getChatId(msg),'Готов отчитаться за день?', evening)
        
         })
-        bot.on('callback_query', (query) =>{
+        bot.on('callback_query',  async (query) =>{
             
             const timess = {
                 reply_markup: {               
@@ -198,7 +195,15 @@ bot.once('contact',  msg=>{
                     bot.sendMessage(getChatId(msg), 'У тебы был полный рабочий день?', timess) 
                 })
             }
-
+            else if (query.data === 'Сегодня не работал'){
+                bot.sendMessage(getChatId(msg), 'ok',)  
+                sequelize.query("UPDATE personals SET fact = $2 WHERE number_phone = $1", {
+                    bind:[telUser,this.tasks],
+                    model: personal,
+                    mapToModel: true,
+                    type: Op.SELECT,
+                }) 
+            }
             if(query.data === 'Полный рабочий день'){
                 bot.sendMessage(getChatId(msg), 'ok',)  
                 
@@ -227,6 +232,50 @@ bot.once('contact',  msg=>{
             }                
         })   
     })
+    
+    bot.onText(/\/reports/, msg => {
+        function rep(){       
+            const isIdUnique = number_phone =>
+                personalModel.findOne({ where: { number_phone} , attributes: ['number_phone'] })
+                .then(token => token !== null)
+                .then(isUnique => isUnique);
+
+            const isIdUniqueAccess = access_level =>
+                personalModel.findOne({ where: { [Op.and]: [{access_level},{number_phone:telUser}] } , attributes: ['number_phone'] })  
+                .then(isIdUniqueAccess => isIdUniqueAccess);
+        
+            isIdUnique(telUser).then(isUnique => {
+                if (isUnique) {
+                    isIdUniqueAccess(1).then(isIdUniqueAccess => {
+                        if (isIdUniqueAccess) {
+                            bot.sendMessage(getChatId(msg), 'Недостаточно прав')
+                        }
+                        else{
+                            bot.sendMessage(getChatId(msg), 'Нажмите на кнопку для просмотра отчетов', {
+                                reply_markup:{
+                                    inline_keyboard:[
+                                        [{text: 'Просмотр отчетов', web_app:{url: webAppUrl}}]
+                                    ]
+                                }
+                            })                    
+                        }
+                    })
+                }
+                else{
+                    bot.sendMessage(getChatId(msg), 'Вас нет в списке, обратьтесь к администратору')
+                }
+            })
+        }
+        rep()
+        
+       
+    })   
+    
+    
+    
+
+
+
 })
 
 
