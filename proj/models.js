@@ -34,14 +34,40 @@ const personal = sequelize.define('personal',
         type: DataTypes.CHAR(100),
         
     },
-    chat_id:{
-        type: DataTypes.CHAR(20),
-        
-    },
     active:{
         type: DataTypes.CHAR(1),
         
     },
+    chat_id:{
+        type: DataTypes.INTEGER,
+        
+    },
 }
 )
-module.exports = personal;
+module.exports.personal = personal;
+
+const reports = sequelize.define('reports',
+{
+    ID:{
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
+    },
+    tasks:{
+        type: DataTypes.CHAR()
+    },
+    fact:{
+        type: DataTypes.CHAR()
+    },
+    hours:{
+        type: DataTypes.INTEGER
+    },
+    date:{
+        type: DataTypes.DATEONLY
+    },
+
+},
+{freezeTableName: true}
+)
+module.exports.reports = reports;

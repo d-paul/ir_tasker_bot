@@ -8,8 +8,9 @@ const token = '5703563310:AAE0tmQJfBQ1zFJxlRy_u9fpo65Dne9dhrM'
 //const helpers = require('./helpers')
 
 const sequelize = require('./db')
-const personalModel = require('./models')
-const personal = require('./models')
+const personalModel = require('./models').personal
+const personal = require('./models').personal
+const reports = require('./models').reports
 const { Op } = require('sequelize')
 const cron = require('node-cron')
 const { query } = require('./db')
@@ -17,28 +18,26 @@ const webAppUrl = 'https://ya.ru'
 
 console.log('bot has been started . . .')
 const bot = new TelegramBot(token, { polling: true})
-
+bot.on("polling_error", console.log);
 
 
 bot.onText(/\/start/, msg => {
    
-    const text = 'Привет '+ msg.from.first_name + ', Отправь номер для регистрации'
     const reqPhone = {
         reply_markup: {
-            one_time_keyboard: true,
+            
             keyboard: [
                 [{
                 text: "Отправить мой номер",
                 request_contact: true,
-                one_time_keyboard: true,
+                remove_keyboard: true,
                 
                 }],
                 ["Отмена"]
             ]
         }
-    }
-    bot.sendMessage(getChatId(msg), text, reqPhone)
-   
+    }  
+      
     try{
         sequelize.authenticate( 
         sequelize.sync(),
@@ -46,23 +45,19 @@ bot.onText(/\/start/, msg => {
         )
 
     } catch (e) { console.log('db  errors')}
-})
- 
-bot.once('contact',  msg=>{
-    const telUser = msg.contact.phone_number.replace('+','')
 
-    function check(){
- 
-        const isIdUnique = number_phone =>
-            personalModel.findOne({ where: { number_phone} , attributes: ['number_phone'] })
+    function check_id(){
+        
+        const isIdUnique = chat_id =>
+            personalModel.findOne({ where: { chat_id} , attributes: ['chat_id'] })
             .then(token => token !== null)
             .then(isUnique => isUnique);
 
         const isIdUniqueAccess = access_level =>
-            personalModel.findOne({ where: { [Op.and]: [{access_level},{number_phone:telUser}] } , attributes: ['number_phone'] })  
+            personalModel.findOne({ where: { [Op.and]: [{access_level},{chat_id:msg.chat.id}] } , attributes: ['chat_id'] })  
             .then(isIdUniqueAccess => isIdUniqueAccess);
     
-        isIdUnique(telUser).then(isUnique => {
+        isIdUnique(msg.chat.id).then(isUnique => {
             if (isUnique) {
                 bot.sendMessage(getChatId(msg), 'Вы можете начать работать с ботом')
 
@@ -71,47 +66,68 @@ bot.once('contact',  msg=>{
                         bot.sendMessage(getChatId(msg), '1')
                     }
                     else{
-                        bot.sendMessage(getChatId(msg), 'Установите пароль:')
-
-                        bot.once('message', (msg) =>{
-                            const pass = msg.text
-                            
-                            sequelize.query("UPDATE personals SET password = $2 WHERE number_phone = $1", {
-                                bind:[telUser,pass],
-                                model: personal,
-                                mapToModel: true,
-                                type: Op.SELECT,
-                            })                        
-                        })                       
-                        bot.once('message', (msg) =>{
-                            bot.sendMessage(getChatId(msg),' Пароль установлен ')   
-                        })                        
+                        bot.sendMessage(getChatId(msg), '!=1')
+                        
                     }
                 })
             }
             else{
-                bot.sendMessage(getChatId(msg), 'Вас нет в списке, обратьтесь к администратору')
+                bot.sendMessage(getChatId(msg), 'Вас нет в списке, отправьте номер ', reqPhone)
+                
+                bot.once('contact', msg=>{
+                    const telUser = msg.contact.phone_number.replace('+','')
+                    
+                    function check_num(){
+    
+                        const isIdUnique = number_phone =>
+                            personalModel.findOne({ where: { number_phone} , attributes: ['number_phone'] })
+                            .then(token => token !== null)
+                            .then(isUnique => isUnique);
+                    
+                        isIdUnique(telUser).then(isUnique => {
+                            if (isUnique) {
+                                bot.sendMessage(getChatId(msg), 'Вы можете начать работать с ботом')
+                                sequelize.query("UPDATE personals SET chat_id = $2 WHERE number_phone = $1", {
+                                    bind:[telUser,msg.chat.id],
+                                    model: personal,   
+                                    mapToModel: true,
+                                    type: Op.SELECT,
+                                })
+                                
+                            }
+                            else{
+                                bot.sendMessage(getChatId(msg), 'Вас нет в списке, обратьтесь к администратору')
+                            }
+                        })
+                    }
+                    check_num()                   
+                })
             }
         })
     }
-    check()
+    check_id()
+})
+ 
 
-    bot.once('message', (msg)=>{
-        cron.schedule('0-35 15 * * 1-5', () =>{
 
-            const morning = {
-        reply_markup: {
             
-            inline_keyboard: [
-                [{
-                    text: 'Ввести план на день',
-                    callback_data: 'Ввести план на день'
-                },{
-                    text: 'Сегодня не работаю',
-                    callback_data: 'Сегодня не работаю'
-                }]
-            ]
-        }
+
+
+    bot.once('message', (msg)=>{       
+        cron.schedule('0-23 14 * * 1-5', () =>{  
+            const morning = {
+                reply_markup: {
+                    
+                    inline_keyboard: [
+                        [{
+                        text: 'Ввести план на день',
+                        callback_data: 'Ввести план на день'
+                        },{
+                        text: 'Сегодня не работаю',
+                        callback_data: 'Сегодня не работаю'
+                        }]
+                    ]
+                }
             }
             bot.sendMessage(getChatId(msg),'Доброе утро! Что на сегодня запланировано?', morning)
    
@@ -123,12 +139,15 @@ bot.once('contact',  msg=>{
                 bot.once('message', (msg)=>{            
                     var tasks = msg.text
             
-                    sequelize.query("UPDATE personals SET tasks = $2 WHERE number_phone = $1", {
-                        bind:[telUser,tasks],
-                        model: personal,   
+                    sequelize.query("UPDATE reports SET tasks = $2 WHERE chat_id= $1", {
+                        bind:[msg.chat.id,tasks],
+                        model: reports,   
                         mapToModel: true,
                         type: Op.SELECT,
                     })
+                })
+                bot.once('message', (msg)=>{
+                    bot.sendMessage(getChatId(msg), 'ok',)  
                 })
         
             } 
@@ -138,12 +157,15 @@ bot.once('contact',  msg=>{
                 bot.once('message', (msg) =>{
                     this.tasks = 'Не работает, т.к: ' + msg.text
         
-                    sequelize.query("UPDATE personals SET tasks = $2 WHERE number_phone = $1", {
-                        bind:[telUser,this.tasks],
-                        model: personal,
+                    sequelize.query("UPDATE reports SET tasks = $2 WHERE chat_id= $1", {
+                        bind:[msg.chat.id,this.tasks],
+                        model: reports,
                         mapToModel: true,
                         type: Op.SELECT,
                     })   
+                })
+                bot.once('message', (msg)=>{
+                    bot.sendMessage(getChatId(msg), 'ok',)  
                 })
             }
         })
@@ -152,7 +174,7 @@ bot.once('contact',  msg=>{
 
 
     bot.once('message', (msg)=>{
-        cron.schedule('11 18 * * 1-5', () =>{
+        cron.schedule('24 14 * * 1-5', () =>{
              
             const evening = {
             reply_markup: {
@@ -197,9 +219,9 @@ bot.once('contact',  msg=>{
             }
             else if (query.data === 'Сегодня не работал'){
                 bot.sendMessage(getChatId(msg), 'ok',)  
-                sequelize.query("UPDATE personals SET fact = $2 WHERE number_phone = $1", {
-                    bind:[telUser,this.tasks],
-                    model: personal,
+                sequelize.query("UPDATE reports SET fact = $2 WHERE chat_id= $1", {
+                    bind:[msg.chat.id,this.tasks],
+                    model: reports,
                     mapToModel: true,
                     type: Op.SELECT,
                 }) 
@@ -208,9 +230,9 @@ bot.once('contact',  msg=>{
                 bot.sendMessage(getChatId(msg), 'ok',)  
                 
                 const facts1 = 'Полный рабочий день, ' + this.facts
-                sequelize.query("UPDATE personals SET fact = $2 WHERE number_phone = $1", {
-                    bind:[telUser,facts1],
-                    model: personal,
+                sequelize.query("UPDATE reports SET fact = $2 WHERE chat_id = $1", {
+                    bind:[msg.chat.id,facts1],
+                    model: reports,
                     mapToModel: true,
                     type: Op.SELECT,
                 })            
@@ -219,9 +241,9 @@ bot.once('contact',  msg=>{
                 bot.sendMessage(getChatId(msg), 'Введи часы работы в формате ЧЧ:ММ - ЧЧ:ММ',)           
                 bot.once('message', (msg)=>{                      
                     timework = 'Часы работы: ' + msg.text + '/ ' + this.facts
-                    sequelize.query("UPDATE personals SET fact = $2 WHERE number_phone = $1", {
-                        bind:[telUser,timework],
-                        model: personal,
+                    sequelize.query("UPDATE reports SET fact = $2 WHERE chat_id = $1", {
+                        bind:[msg.chat.id,timework],
+                        model: reports,
                         mapToModel: true,
                         type: Op.SELECT,
                       })
@@ -235,16 +257,16 @@ bot.once('contact',  msg=>{
     
     bot.onText(/\/reports/, msg => {
         function rep(){       
-            const isIdUnique = number_phone =>
-                personalModel.findOne({ where: { number_phone} , attributes: ['number_phone'] })
+            const isIdUnique = chat_id =>
+                personalModel.findOne({ where: { chat_id} , attributes: ['chat_id'] })
                 .then(token => token !== null)
                 .then(isUnique => isUnique);
 
             const isIdUniqueAccess = access_level =>
-                personalModel.findOne({ where: { [Op.and]: [{access_level},{number_phone:telUser}] } , attributes: ['number_phone'] })  
+                personalModel.findOne({ where: { [Op.and]: [{access_level},{chat_id:msg.chat.id}] } , attributes: ['chat_id'] })  
                 .then(isIdUniqueAccess => isIdUniqueAccess);
         
-            isIdUnique(telUser).then(isUnique => {
+            isIdUnique(msg.chat.id).then(isUnique => {
                 if (isUnique) {
                     isIdUniqueAccess(1).then(isIdUniqueAccess => {
                         if (isIdUniqueAccess) {
@@ -270,13 +292,12 @@ bot.once('contact',  msg=>{
         
        
     })   
-    
+  
     
     
 
 
 
-})
 
 
 
