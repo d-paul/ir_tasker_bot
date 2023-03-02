@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "date-fns": "^2.29.3",
     "node-cron": "^3.0.2",
     "node-telegram-bot-api": "^0.61.0",
     "pg": "^8.8.0",

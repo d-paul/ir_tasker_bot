@@ -15,6 +15,7 @@ const { Op } = require('sequelize')
 const cron = require('node-cron')
 const { query } = require('./db')
 const webAppUrl = 'https://ya.ru'
+const {format} = require('date-fns')
 
 console.log('bot has been started . . .')
 const bot = new TelegramBot(token, { polling: true})
@@ -110,11 +111,29 @@ bot.onText(/\/start/, msg => {
  
 
 
-            
+        
+        
+
+
+
+
 
 
     bot.once('message', (msg)=>{       
-        cron.schedule('0-23 14 * * 1-5', () =>{  
+        const today = format(new Date(),'yyyy-MM-dd');  
+        
+        cron.schedule('23 14 * * 1-5', () =>{
+        reports.create({
+            tasks:"",
+            fact: "",
+            date: today,
+            hours: 8,
+            chat_id: msg.chat.id,
+        })
+   
+    })
+
+        cron.schedule('13 14 * * 1-5', () =>{  
             const morning = {
                 reply_markup: {
                     
@@ -139,8 +158,8 @@ bot.onText(/\/start/, msg => {
                 bot.once('message', (msg)=>{            
                     var tasks = msg.text
             
-                    sequelize.query("UPDATE reports SET tasks = $2 WHERE chat_id= $1", {
-                        bind:[msg.chat.id,tasks],
+                    sequelize.query("UPDATE reports SET tasks = $2 WHERE chat_id= $1 AND date = $3", {
+                        bind:[msg.chat.id,tasks,today],
                         model: reports,   
                         mapToModel: true,
                         type: Op.SELECT,
@@ -157,8 +176,8 @@ bot.onText(/\/start/, msg => {
                 bot.once('message', (msg) =>{
                     this.tasks = 'Не работает, т.к: ' + msg.text
         
-                    sequelize.query("UPDATE reports SET tasks = $2 WHERE chat_id= $1", {
-                        bind:[msg.chat.id,this.tasks],
+                    sequelize.query("UPDATE reports SET tasks = $2 WHERE chat_id= $1 AND date = $3", {
+                        bind:[msg.chat.id,this.tasks,today],
                         model: reports,
                         mapToModel: true,
                         type: Op.SELECT,
@@ -172,9 +191,10 @@ bot.onText(/\/start/, msg => {
     })
 
 
+    
 
     bot.once('message', (msg)=>{
-        cron.schedule('24 14 * * 1-5', () =>{
+        cron.schedule('23 17 * * 1-5', () =>{
              
             const evening = {
             reply_markup: {
@@ -219,8 +239,8 @@ bot.onText(/\/start/, msg => {
             }
             else if (query.data === 'Сегодня не работал'){
                 bot.sendMessage(getChatId(msg), 'ok',)  
-                sequelize.query("UPDATE reports SET fact = $2 WHERE chat_id= $1", {
-                    bind:[msg.chat.id,this.tasks],
+                sequelize.query("UPDATE reports SET fact = $2 WHERE chat_id= $1 AND date = $3", {
+                    bind:[msg.chat.id,this.tasks,today],
                     model: reports,
                     mapToModel: true,
                     type: Op.SELECT,
@@ -230,8 +250,8 @@ bot.onText(/\/start/, msg => {
                 bot.sendMessage(getChatId(msg), 'ok',)  
                 
                 const facts1 = 'Полный рабочий день, ' + this.facts
-                sequelize.query("UPDATE reports SET fact = $2 WHERE chat_id = $1", {
-                    bind:[msg.chat.id,facts1],
+                sequelize.query("UPDATE reports SET fact = $2 WHERE chat_id = $1 AND date = $3", {
+                    bind:[msg.chat.id,facts1,today],
                     model: reports,
                     mapToModel: true,
                     type: Op.SELECT,
@@ -241,8 +261,8 @@ bot.onText(/\/start/, msg => {
                 bot.sendMessage(getChatId(msg), 'Введи часы работы в формате ЧЧ:ММ - ЧЧ:ММ',)           
                 bot.once('message', (msg)=>{                      
                     timework = 'Часы работы: ' + msg.text + '/ ' + this.facts
-                    sequelize.query("UPDATE reports SET fact = $2 WHERE chat_id = $1", {
-                        bind:[msg.chat.id,timework],
+                    sequelize.query("UPDATE reports SET fact = $2 WHERE chat_id = $1 AND date = $3", {
+                        bind:[msg.chat.id,timework,today],
                         model: reports,
                         mapToModel: true,
                         type: Op.SELECT,
