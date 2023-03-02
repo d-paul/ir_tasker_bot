@@ -13,9 +13,6 @@ if ($_GET['button-form'] == 'button-add'){
   else {
     $add_date_birth = "'$add_date_birth'";
   }
-  if (mb_substr($add_number_phone,0,1)=='+'){
-    $add_number_phone=substr($add_number_phone,1,mb_strlen($add_number_phone));
-  }
   $sql = "SELECT number_phone FROM personals WHERE number_phone='$add_number_phone'";
   $res = pg_query($connection, $sql);
   $row = pg_fetch_array($res);
