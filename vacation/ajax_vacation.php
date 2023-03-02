@@ -1,4 +1,5 @@
 <?php
+include '../db.php';
 //..................Отпуск(контент)................................
 if (isset($_POST['chatid']) && !isset($_POST['start'])){
   $sql ="SELECT active FROM personals WHERE chat_id = '".$_POST['chatid']."'";
