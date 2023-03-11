@@ -214,7 +214,7 @@ $(document).on('click', '.air-datepicker-cell.-day-:not(.-other-month-)', functi
           <label for='fact'>Факт</label>
           <textarea class='form-control' id='fact' type='text'>${$(this).attr('fact') ?? ''}</textarea>
           <div class='row' style='padding-top:5px'>
-            <label for='hours' style='width:140px'>Отработано:</label>
+            <label for='hours' style='width:70px'>Часы:</label>
             <input maxlength='2' class='form-control' id='hours' type='text' style='width:30px; padding:2px' value='${$(this).attr('hours') ?? ''}'>
           </div>
         </div>

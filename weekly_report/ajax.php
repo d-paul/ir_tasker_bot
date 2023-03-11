@@ -44,10 +44,13 @@ if (isset($_POST['chatid'])){
             </div>
             <div class='row'>
                 <label class='fs-5'>Факт</label>
-                <textarea class='form-control fs-6' id='plan' type='text'>".$row[1]."</textarea>
+                <textarea class='form-control fs-6' id='fact' type='text'>".$row[1]."</textarea>
+            </div>
+            <div class='row'>
+            <label class='fs-5' for='hours' style='width:70px'>Часы:</label>
+            <input maxlength='2' class='form-control' id='hours' type='text' style='width:30px; padding:2px' value='".$row[2]."'>
             </div>
             </div>`);");
-            $i++;
         }
     } else {
         echo("document.getElementById('tgonly').innerHTML = '<h1>У вас нет доступа!</h1>';");
