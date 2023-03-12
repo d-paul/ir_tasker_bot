@@ -1,0 +1,12 @@
+let canvas = document.getElementById("clock");
+let size = canvas.width;
+let clock = canvas.getContext("2d");
+clock.scale(1,0.5);
+clock.fillStyle = "rgba(255,0,0,0.4)";
+clock.strokeStyle = "rgba(0,0,0,0)";
+clock.beginPath();
+clock.arc(size/2,size/2,size/2,Math.PI,Math.PI*0.5,true);
+clock.lineTo(size/2,size/2);
+clock.stroke();
+clock.closePath();
+clock.fill();

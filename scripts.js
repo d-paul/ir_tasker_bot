@@ -220,7 +220,7 @@ $(document).on('click', '.air-datepicker-cell.-day-:not(.-other-month-)', functi
         </div>
       </div>
     </div>`);
-  let top = $(this).offset().top+$(this).height()*3/4;
+  let top = $(this).offset().top-window.scrollY+$(this).height()*3/4;
   let left = $(this).offset().left+$(this).width()/2-$('#DailyReport').width()/2;
   if ( ($('body').height() - top) < 280 ){
     top = ($('body').height() - ($('body').height() - top)-60)
