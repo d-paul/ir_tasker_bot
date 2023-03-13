@@ -26,28 +26,6 @@ function getdata($connection, $tel)
     return array($number_phone,$date_birth,$full_name,$post,$team,$access_level,$password,$chat_id, $active);
 }
 
-//...............Авторизация................
-function check($connection, $tel, $password)
-{
-    if (mb_substr($tel,0,1)=='+'){
-        $tel=substr($tel,1,mb_strlen($tel));
-    }
-    $employee=getdata($connection, $tel);
-    if ($password==$employee[6] && $employee[6]!=''){
-        if ($employee[5]!=1){
-            $_SESSION['auth']=$employee[0];
-            header("refresh:0");
-        }
-        else {
-            $check='У вас недостаточно прав!';
-        }
-    }
-    else {
-        $check='Неверный номер или пароль!';
-    }
-    Echo("<p class='text-center' style='color:red; margin-top:10px'>$check</p>");
-}
-
 //...........Уровень доступа.................
 function access($connection)
 {
