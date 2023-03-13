@@ -17,7 +17,10 @@
             $query .= " AND active != 'N'";
         }
         if (isset($_GET['search']) && $_GET['search']!=''){
-            $search=pg_escape_string($_GET['search']);
+            $search=trim(pg_escape_string($_GET['search']));
+            if (mb_substr($search,0,1)=='+'){
+                $search=substr($search,1,mb_strlen($search));
+            }
             $query .= " AND ( number_phone iLIKE '%".$search."%' OR full_name iLIKE '%".$search."%' OR post iLIKE '%".$search."%' OR team iLIKE '%".$search."%')";
         }
         if (isset($_POST['sort'])){
@@ -26,7 +29,6 @@
         else {
             $query .= " ORDER BY full_name ASC";
         }
-        echo "$q";
         $rs = pg_query($connection, $query) or die("wait what\n");
         while ($row = pg_fetch_array($rs)) {
             if ($row[7]=='N'){
@@ -43,7 +45,7 @@
             }
             echo "
             <tr class='emp_edit $NonActive $selected' value='$row[0]'>
-            <td>$row[0]</td>
+            <td>+$row[0]</td>
             <td>$row[2]</td>
             <td class='post-report'>$row[3]</td>
             <td class='team-report'>$row[4]</td>
