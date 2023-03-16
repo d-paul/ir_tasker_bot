@@ -42,7 +42,8 @@ const personal = sequelize.define('personal',
         type: DataTypes.BIGINT,
         
     },
-}
+},
+
 )
 module.exports.personal = personal;
 
@@ -75,6 +76,6 @@ const reports = sequelize.define('reports',
     },
 
 },
-{freezeTableName: true}
+{freezeTableName: true},
 )
 module.exports.reports = reports;
