@@ -79,3 +79,94 @@ const reports = sequelize.define('reports',
 {freezeTableName: true},
 )
 module.exports.reports = reports;
+
+const report_aprove = sequelize.define('report_aprove',
+{
+    id:{
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
+    },
+    chat_id:{
+        type: DataTypes.BIGINT
+    },
+    fact1:{
+        type: DataTypes.CHAR()
+    },
+    hours1:{
+        type: DataTypes.INTEGER
+    },
+    date1:{
+        type: DataTypes.DATEONLY
+    },
+    worked1:{
+        type: DataTypes.CHAR()
+    },
+    time_work1:{
+        type: DataTypes.CHAR()
+    },
+    fact2:{
+        type: DataTypes.CHAR()
+    },
+    hours2:{
+        type: DataTypes.INTEGER
+    },
+    date2:{
+        type: DataTypes.DATEONLY
+    },
+    worked2:{
+        type: DataTypes.CHAR()
+    },
+    time_work2:{
+        type: DataTypes.CHAR()
+    },
+    fact3:{
+        type: DataTypes.CHAR()
+    },
+    hours3:{
+        type: DataTypes.INTEGER
+    },
+    date3:{
+        type: DataTypes.DATEONLY
+    },
+    worked3:{
+        type: DataTypes.CHAR()
+    },
+    time_work3:{
+        type: DataTypes.CHAR()
+    },
+    fact4:{
+        type: DataTypes.CHAR()
+    },
+    hours4:{
+        type: DataTypes.INTEGER
+    },
+    date4:{
+        type: DataTypes.DATEONLY
+    },
+    worked4:{
+        type: DataTypes.CHAR()
+    },
+    time_work4:{
+        type: DataTypes.CHAR()
+    },
+    fact5:{
+        type: DataTypes.CHAR()
+    },
+    hours5:{
+        type: DataTypes.INTEGER
+    },
+    date5:{
+        type: DataTypes.DATEONLY
+    },
+    worked5:{
+        type: DataTypes.CHAR()
+    },
+    time_work5:{
+        type: DataTypes.CHAR()
+    }
+},
+{freezeTableName: true}
+)
+module.exports.report_aprove = report_aprove;
