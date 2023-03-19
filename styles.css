@@ -18,7 +18,7 @@ html, body{
     height: 330px;
     width: 500px;
 }
-.form-select{
+.filter-select{
     max-width: 150px;
 }
 .table{

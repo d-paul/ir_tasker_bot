@@ -21,7 +21,7 @@ if (isset($_POST['chatid']) && !isset($_POST['start'])){
 
 //..................Указание отпуска................................
 if (isset($_POST['start'])){
-  //$sql ="INSERT INTO vacation VALUES ('".$_POST['chatid']."', '".$_POST['start']."', '".$_POST['end']."', 'awaiting')";
-  //pg_query($connection, $sql);
+  $sql ="INSERT INTO vacation VALUES ('".$_POST['chatid']."', '".$_POST['start']."', '".$_POST['end']."', 'awaiting')";
+  pg_query($connection, $sql);
 }
 ?>

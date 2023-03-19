@@ -33,10 +33,10 @@ include 'php.php';
             <label for="InputTel" class="form-label">Введите номер телефона</label>
             <div class ='mx-auto'>
               <input readonly type='tel' class='form-control' style='width:20px; padding:6px 1px 6px 0px; margin-right:-5px; display:inline; border:none; border-radius:5px 0 0 5px;' onclick='this.nextElementSibling.focus();' value='+7'>
-              <input autocomplete='off' onkeypress='return event.charCode >= 48 && event.charCode <= 57' type='tel' maxlength='10' class='form-control' style='width:200px; padding-left:2px; display:inline; border:none; border-radius:0 5px 5px 0; outline:none; box-shadow: none;' id='InputTel' name='InputTel'>
+              <input autocomplete='off' onkeypress='return event.charCode >= 48 && event.charCode <= 57' type='tel' maxlength='10' class='form-control auth_enter' style='width:200px; padding-left:2px; display:inline; border:none; border-radius:0 5px 5px 0; outline:none; box-shadow: none;' id='InputTel' name='InputTel'>
             </div>
           </div>
-          <button type="button" class="btn btn-primary" name="button-auth" onclick="auth_num()">Отправить</button>
+          <button type="button" class="btn btn-primary auth_button" name="button-auth" onclick="auth_num()">Отправить</button>
           <p class='text-center' id ='auth-error' style='color:red; margin-top:10px'></p>
         </form>
       </div>
@@ -60,6 +60,13 @@ include 'php.php';
           </li>
         </ul>
         <button type="button" class="btn btn-success" onclick="add()">Добавить сотрудника</button>
+        <?php
+        if (access($connection) == 3) {
+        ?>
+        <button type="button" class="btn btn-success" style="margin-left: 10px;" onclick="teams()">Команды</button>
+        <?php
+        }
+        ?>
         <form method="POST"><button type="submit" class="btn btn-success" style="margin-left: 10px; background-color:grey; border-color:black" name="button-exit">Выход</button></form>
       </div>
     </div>
@@ -98,7 +105,7 @@ include 'php.php';
               </th>
               <th scope="col" class='post-report'>
                 <div class="sort" value="post">Должность</div>
-                <select class="form-select filters" name="filter-post" id="filter-post">
+                <select class="form-select filter-select filters" name="filter-post" id="filter-post">
                   <option value="Все">Все</option>
                   <?php
                     $sql = "SELECT post FROM personals WHERE post != '' AND access_level<".access($connection)." GROUP BY post";
@@ -113,7 +120,7 @@ include 'php.php';
               </th>
               <th scope="col" class='team-report'>
                 <div class="sort" value="team">Команда</div>
-                <select class="form-select filters" name="filter-team" id="filter-team">
+                <select class="form-select filter-select filters" name="filter-team" id="filter-team">
                   <option value="Все">Все</option>
                   <?php
                     $sql = "SELECT * FROM team";
@@ -140,7 +147,7 @@ include 'php.php';
     </div>
   </div>
 </div>
-<!-- Модальное окно (Редактирование/удаление) -->
+<!-- Модальное окно (Редактирование) -->
 <div class="modal fade" id="Modal" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" style="--bs-modal-width: auto; margin:0 5vW;">
     <div class="modal-content">
@@ -149,7 +156,7 @@ include 'php.php';
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" id="edit">
-        <form onsubmit="return false;"  class="row gy-2 gx-3 align-items-center text-center formsql" name="button-save" id="form_edit">
+        <form onsubmit="return false;"  class="row gy-2 gx-3 align-items-center text-center" name="button-save" id="form_edit">
         </form>
       </div>
     </div>
@@ -164,7 +171,7 @@ include 'php.php';
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form onsubmit="return false;" class="row gy-2 gx-3 align-items-center text-center formsql" name="button-add">
+        <form onsubmit="return false;" class="row gy-2 gx-3 align-items-center text-center" name="button-add">
           <input type="hidden" name="button-form" value="button-add">
           <div class="col-auto mx-auto">
             <label for="number_phone">Номер телефона</label>
@@ -241,7 +248,38 @@ include 'php.php';
     </div>
   </div>
 </div>
+<!--...........Команды............-->
 <?php
+if (access($connection) == 3) {
+?>
+<div class="modal fade" id="modal_teams" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="--bs-modal-width: auto; margin:0 5vW;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5">Команды</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="return false;" class="row gy-2 gx-3 align-items-center text-center" name="button-add">
+          <div class="col-auto mx-auto">
+            <input type="text" class="form-control" id="" value="Команда 1">
+            <select class="form-select" style='margin-top:8px; max-width:250px;' name="access_level" id="access_level">
+            <?php
+              $sql_com = "SELECT * FROM personals WHERE active = 'Y' AND access_level > 1";
+              $rescom = pg_query($connection, $sql_com) or die("wait what\n");
+              while ($combobox = pg_fetch_array($rescom)) {
+                echo "<option style = 'max-width:100px;' value='".$combobox[0]."'>".$combobox[2]." (".$combobox[3].")</option>";
+              }
+            ?>
+            </select>
+          </div>  
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<?php
+    }
   }
 ?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>

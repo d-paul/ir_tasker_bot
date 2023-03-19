@@ -3,6 +3,7 @@
     include 'db.php';
     include 'php.php';
       $employee = getdata($connection, $_GET["tel"]);
+      if(!empty($_SESSION['auth'])) {
       ?>
         <input type="hidden" name="button-form" value="button-save">
           <div class="col-auto mx-auto">
@@ -78,6 +79,7 @@
             <button type="submit" class="btn btn-primary" name="button-save">Сохранить изменения</button>
           </div>
           <?php
+          }
           }
           ?>
         

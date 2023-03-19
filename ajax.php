@@ -1,6 +1,7 @@
 <?php
 include 'db.php';
 include 'php.php';
+include 'token.php';
 //...........Добавление сотрудника...............
 if ($_GET['button-form'] == 'button-add'){
   $add_date_birth = $_GET['add_date_birth'];
@@ -64,14 +65,14 @@ if (isset($_GET['InputTel']))
           $code = rand(100000,999999);
           $sql ="UPDATE personals SET password = '".$code."' WHERE number_phone = '".$tel."'";
           pg_query($connection, $sql);
-          file_get_contents("https://api.telegram.org/bot5703563310:AAE0tmQJfBQ1zFJxlRy_u9fpo65Dne9dhrM/sendMessage?chat_id=".$employee[7]."&text=".$code);
+          file_get_contents("https://api.telegram.org/bot".$token."/sendMessage?chat_id=".$employee[7]."&text=".$code);
           echo "document.getElementById('auth').innerHTML = \"<div class='mb-3'>\
           <input type='hidden' name='InputCode_tel' value='".$tel."'>\
           <label for='InputCode' class='form-label'>Введите код</label>\
-          <input type='code' class='form-control mx-auto' style='width:250px;' id='InputCode' name='InputCode'>\
+          <input type='code' class='form-control mx-auto auth_enter' style='width:250px;' id='InputCode' name='InputCode'>\
           <label style='color:lightgrey; font-size:80%'>Код был отправлен на номер +".$tel."</label><br/>\
           <button class='button-back' type='button' style='' onclick='auth_back()'><a>Ошиблись номером?</br>(вернуться)</a></button>\
-          </div><button type='button' class='btn btn-primary' name='button-auth' onclick='auth_num()'>Подтвердить</button>\
+          </div><button type='button' class='btn btn-primary auth_button' name='button-auth' onclick='auth_num()'>Подтвердить</button>\
           <p class='text-center' id='auth-error' style='color:red; margin-top:10px'></p>\"";
         }
         else{
@@ -111,11 +112,11 @@ if (isset($_GET['Back']))
   <div class='row'>
   <div class ='mx-auto'>
   <input readonly type='tel' class='form-control' style='width:20px; padding:6px 1px 6px 0px; margin-right:-5px; display:inline; border:none; border-radius:5px 0 0 5px;' onclick='this.nextElementSibling.focus();' value='+7'>
-  <input autocomplete='off' type='tel' maxlength='10' class='form-control' style='width:200px; padding-left:2px; display:inline; border:none; border-radius:0 5px 5px 0; outline:none; box-shadow: none;' id='InputTel' name='InputTel'>
+  <input autocomplete='off' onkeypress='return event.charCode >= 48 && event.charCode <= 57' type='tel' maxlength='10' class='form-control auth_enter' style='width:200px; padding-left:2px; display:inline; border:none; border-radius:0 5px 5px 0; outline:none; box-shadow: none;' id='InputTel' name='InputTel'>
   </div>
   </div>
   </div>
-  <button type='button' class='btn btn-primary' name='button-auth' onclick='auth_num()'>Отправить</button>
+  <button type='button' class='btn btn-primary auth_button' name='button-auth' onclick='auth_num()'>Отправить</button>
   <p class='text-center' id='auth-error' style='color:red; margin-top:10px'></p>";
 }
 

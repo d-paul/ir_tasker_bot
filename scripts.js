@@ -255,3 +255,23 @@ $(document).on('paste', "input[type='tel']", function(e) {
   text = text.substring(0,e.target.selectionStart)+tel+text.substring(e.target.selectionEnd,e.length);
   $(this).val(text);
 });
+
+//...........Авторизация(enter).......
+$(document).on('keypress','.auth_enter' , function (e) {
+  if(e.which === 13){
+    $('.auth_button').click();
+  }
+});
+
+//..........Модальное окно(команды)....................
+function teams(){
+  $('#modal_teams').modal('show');  
+  $.ajax({
+    type: "POST",
+    url: "ajax.php?tel="+tel,
+    data: {},
+    success: function (data) {
+      document.getElementById("form_edit").innerHTML = data;
+    }
+  });
+};

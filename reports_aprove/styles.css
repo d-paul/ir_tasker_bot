@@ -1,8 +1,10 @@
 .text-start{
     padding-left:0;
+    float:left;
 }
 .text-end{
     padding-right:0;
+    float:right;
 }
 textarea{
     margin-bottom: 10px;
@@ -16,13 +18,4 @@ textarea{
 }
 .date{
     border-bottom: 1px solid black;
-}
-.clock{
-    width:100%;
-    aspect-ratio:1;
-}
-#clock{
-    min-height:100%;
-    background-image: url(../images/clock.jpg);
-    background-size:100% 100%;
 }

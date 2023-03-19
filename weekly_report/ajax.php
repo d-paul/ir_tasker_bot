@@ -1,5 +1,7 @@
 <?php
 include '../db.php';
+include '../token.php';
+include '../webapp.php';
 
 $days = [
     1 => 'Понедельник',
@@ -11,7 +13,7 @@ $days = [
     7 => 'Воскресенье',
   ];
 
-if (isset($_POST['chatid'])){
+if (isset($_POST['chatid']) && !isset($_POST['time_work'])) {
   $sql ="SELECT active FROM personals WHERE chat_id = '".$_POST['chatid']."'";
   $res = pg_query($connection, $sql);
   $bool = false;
@@ -26,10 +28,10 @@ if (isset($_POST['chatid'])){
     $start = date('Y-m-d', strtotime('monday this week'.' -7 day'));
     $end = date('Y-m-d',strtotime('friday this week'.' -7 day'));
     if ($bool) {
-        $sql ="SELECT tasks, fact, hours, date FROM reports WHERE chat_id = '".$_POST['chatid']."' AND date BETWEEN '".$start."' AND '".$end."' ORDER BY date";
+        $sql ="SELECT tasks, fact, hours, date, time_work, worked FROM reports WHERE chat_id = '".$_POST['chatid']."' AND date BETWEEN '".$start."' AND '".$end."' ORDER BY date";
         $res = pg_query($connection, $sql);
         while ($row = pg_fetch_array($res)) {
-            echo("$('#tgonly').append(`<div class='day'>
+            echo("$('#tgonly').append(`<div class='day' date='".$row[3]."'>
             <div class='row date'>
                 <div class='col text-start'>
                     <span class='fs-5 fst-italic'>".$days[date('w', strtotime($row[3]))]."</span>
@@ -39,21 +41,111 @@ if (isset($_POST['chatid'])){
                 </div>
             </div>
             <div class='row'>
-                <label class='fs-5'>План</label>
-                <textarea class='form-control fs-6' id='plan' type='text'>".$row[0]."</textarea>
-            </div>
-            <div class='row'>
                 <label class='fs-5'>Факт</label>
-                <textarea class='form-control fs-6' id='fact' type='text'>".$row[1]."</textarea>
+                <textarea class='form-control fs-6 fact' type='text'>".$row[1]."</textarea>
+            </div>
+            <div class='row row_time_work' date='".$row[3]."' ".($check = ($row[5] == 'Y') ? "" : "style='display:none;'").">
+                <label class='fs-5 time_work' date='".$row[3]."' hours='".$row[2]."' time_work='".$row[4]."' style='width:50%'>".$row[4]." (".$row[2].")</label>
+                <button type='button' style='width:50%' class='btn btn-primary but_time_work'>Выбрать время</button>
             </div>
             <div class='row'>
-            <label class='fs-5' for='hours' style='width:70px'>Часы:</label>
-            <input maxlength='2' class='form-control' id='hours' type='text' style='width:30px; padding:2px' value='".$row[2]."'>
+                <label class='fs-5' style='width:100px;'>Работал?</label>
+                <input ".($check = ($row[5] == 'Y') ? 'checked' : '')." type='checkbox' class='form-check-input worked' style='margin:9px 0; padding:0;'>
             </div>
             </div>`);");
-        }
+        };
     } else {
         echo("document.getElementById('tgonly').innerHTML = '<h1>У вас нет доступа!</h1>';");
     }
+}
+if (isset($_POST['time_work'])) {
+    $message_id = $_POST['message_id'];
+    $date = $_POST['date'];
+    $fact = $_POST['fact'];
+    $worked = $_POST['worked'];
+    $hours = $_POST['hours'];
+    $time_work = $_POST['time_work'];
+    $chatid = $_POST['chatid'];
+    $n = 0;
+    $sql ="INSERT INTO report_aprove(chat_id,fact1,hours1,date1,worked1,time_work1,fact2,hours2,date2,worked2,time_work2,fact3,hours3,date3,worked3,time_work3,fact4,hours4,date4,worked4,time_work4,fact5,hours5,date5,worked5,time_work5) VALUES ('".$chatid."'";
+    for ($i = 1; $i <= 5; $i++) {
+        if (date('w', strtotime($date[$n])) == $i) {
+            $sql=$sql.", '".$fact[$n]."', '".$hours[$n]."', '".$date[$n]."', '".$worked[$n]."', '".$time_work[$n]."'";
+            $n++;
+        } else {
+            $sql=$sql.", null, null, null, null, null";
+        }
+    }
+    $sql=$sql.") RETURNING id";
+    pg_query($connection, $sql);
+    $res = pg_query($connection, $sql);
+    $id;
+    while ($row = pg_fetch_array($res)) {
+        $id = $row[0];
+    }
+
+    $sql="SELECT full_name FROM personals WHERE chat_id='".$chatid."'";
+    pg_query($connection, $sql);
+    $res = pg_query($connection, $sql);
+    $fullname;
+    while ($row = pg_fetch_array($res)) {
+        $fullname = $row[0];
+    }
+
+    $getQuery = array(
+        "chat_id" 	=> 1009006231,
+        "text"  	=> $fullname." хочет изменить еженедельный отчет.",
+        'reply_markup' => json_encode(array(
+            'inline_keyboard' => array(
+                array(
+                    array(
+                        'text' => 'Посмотреть',
+                        'web_app' => array('url' => $webAppUrl.'/reports_aprove.php?id='.$id),
+                    ),
+                )
+            ),
+        )),
+        "parse_mode" => "html"
+    );
+    $ch = curl_init("https://api.telegram.org/bot". $token ."/sendMessage?" . http_build_query($getQuery));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HEADER, false);
+    $resultQuery = json_decode(curl_exec($ch), true);
+    curl_close($ch);
+
+    $getQuery = array(
+        "chat_id" 	=> $chatid,
+        "message_id"  	=> $resultQuery['result']['message_id'],
+        'reply_markup' => json_encode(array(
+            'inline_keyboard' => array(
+                array(
+                    array(
+                        'text' => 'Посмотреть',
+                        'web_app' => array('url' => $webAppUrl.'/reports_aprove.php?id='.$id.'&message_id='.$resultQuery['result']['message_id']),
+                    ),
+                )
+            ),
+        )),
+        "parse_mode" => "html"
+    );
+    $ch = curl_init("https://api.telegram.org/bot". $token ."/editMessageReplyMarkup?" . http_build_query($getQuery));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HEADER, false);
+    $resultQuery = curl_exec($ch);
+    curl_close($ch);
+
+    $getQuery = array(
+        "chat_id" 	=> $chatid,
+        "message_id"  	=> $message_id,
+        'reply_markup' => json_encode(array(
+            'keyboard' => []
+        )),
+        "parse_mode" => "html"
+    );
+    $ch = curl_init("https://api.telegram.org/bot". $token ."/editMessageReplyMarkup?" . http_build_query($getQuery));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HEADER, false);
+    $resultQuery = curl_exec($ch);
+    curl_close($ch);
 }
 ?>

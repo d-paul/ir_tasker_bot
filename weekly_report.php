@@ -10,24 +10,20 @@
 <body>
   <div class="container h-100 justify-content-center">
     <div class="flex-column" id="tgonly">
-        <!--<div class='day'>
-            <div class='row date'>
-                <div class='col text-start'>
-                    <span class='fs-5 fst-italic'>Понедельник</span>
-                </div>
-                <div class='col text-end'>
-                    <span class='fs-5 fst-italic'>01.01.2023</span>
-                </div>
-            </div>
-            <div class='row'>
-                <label class='fs-5'>План</label>
-                <textarea class='form-control fs-6' id='plan' type='text'></textarea>
-            </div>
-            <div class='row'>
-                <label class='fs-5'>Факт</label>
-                <textarea class='form-control fs-6' id='plan' type='text'></textarea>
-            </div>
-        </div>-->
+    </div>
+  </div>
+  <div class='modal fade' id='time' aria-hidden="true">
+    <div class='modal-dialog modal-dialog-centered' style='--bs-modal-width: auto; margin:0 5vW;'>
+      <div class='modal-content'>
+        <div class='modal-header'>
+          <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+        </div>
+        <div class='modal-body' style='padding:0;' id='edit'>
+          <div class="clock">
+            <canvas id="clock" style="width:100%; height:100%;"></canvas>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
