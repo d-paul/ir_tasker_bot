@@ -265,13 +265,14 @@ $(document).on('keypress','.auth_enter' , function (e) {
 
 //..........Модальное окно(команды)....................
 function teams(){
-  $('#modal_teams').modal('show');  
+  document.getElementById('teams').innerHTML = '';
+  $('#modal_teams').modal('show');
   $.ajax({
     type: "POST",
-    url: "ajax.php?tel="+tel,
-    data: {},
+    url: "ajax.php",
+    data: {teams: 'da',},
     success: function (data) {
-      document.getElementById("form_edit").innerHTML = data;
+      eval(data);
     }
   });
 };

@@ -140,4 +140,25 @@ if (isset($_POST['first']) && isset($_POST['last'])){
     echo "$(\".air-datepicker-cell[day='".$row[3]."']\").attr('hours', '".$row[2]."');";
   }
 }
+
+//.......Команды..............
+if (isset($_POST['teams'])) {
+  $sql = "SELECT * FROM personals WHERE active = 'Y' AND access_level > 1";
+  $res = pg_query($connection, $sql) or die("wait what\n");
+  while ($combobox = pg_fetch_array($res)) {
+    echo  "document.getElementById('teams').innerHTML += `
+    <div class='row' style='padding-left:8%;padding-bottom:10px;'>
+      <div class='col' style='width:40%; flex:auto;padding:0;'>
+        <input type='text' class='form-control' id='' value='Команда 1'>
+      </div>
+      <div class='col' style='width:60%; flex:auto; padding:0; padding-left:5px;'>
+        <select class='form-select' id='access_level'>
+          <option value='".$combobox[0]."'>".$combobox[2]." (".$combobox[3].")</option>;
+          }
+        </select>
+      </div>
+    </div>
+    `;";
+  }
+}
 ?>

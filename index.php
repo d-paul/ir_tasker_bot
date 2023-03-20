@@ -241,7 +241,7 @@ include 'php.php';
 </div>
 <!--.............Список действий..........-->
 <div class="modal" id="list" aria-hidden="true">
-  <div class="modal-dialog custom-class" id="list_content" style=" margin:0;">
+  <div class="modal-dialog custom-class" id="list_content" style=" margin:0; width:150px;">
     <div class="modal-content">
     <button class='but_edit' id='modal_but_edit'>Редактировать</button>
     <button>Отчет</button>
@@ -253,26 +253,14 @@ include 'php.php';
 if (access($connection) == 3) {
 ?>
 <div class="modal fade" id="modal_teams" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" style="--bs-modal-width: auto; margin:0 5vW;">
+  <div class="modal-dialog modal-dialog-centered mx-auto" style="max-width:95%; width:500px;">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5">Команды</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form onsubmit="return false;" class="row gy-2 gx-3 align-items-center text-center" name="button-add">
-          <div class="col-auto mx-auto">
-            <input type="text" class="form-control" id="" value="Команда 1">
-            <select class="form-select" style='margin-top:8px; max-width:250px;' name="access_level" id="access_level">
-            <?php
-              $sql_com = "SELECT * FROM personals WHERE active = 'Y' AND access_level > 1";
-              $rescom = pg_query($connection, $sql_com) or die("wait what\n");
-              while ($combobox = pg_fetch_array($rescom)) {
-                echo "<option style = 'max-width:100px;' value='".$combobox[0]."'>".$combobox[2]." (".$combobox[3].")</option>";
-              }
-            ?>
-            </select>
-          </div>  
+        <form onsubmit="return false;" class="row gy-2 gx-3 " id = 'teams'>
         </form>
       </div>
     </div>
