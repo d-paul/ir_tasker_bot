@@ -2,7 +2,6 @@
 include '../db.php';
 include '../token.php';
 include '../webapp.php';
-
 $days = [
     1 => 'Понедельник',
     2 => 'Вторник',

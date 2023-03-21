@@ -2,7 +2,7 @@
     include "db.php";
     include "php.php";
     session_start();
-    if(!empty($_SESSION['auth'])){
+    if(!empty($_SESSION['auth'])) {
         $query = "SELECT * FROM personals WHERE number_phone = '".$_SESSION['auth']."' OR access_level<".access($connection);
         if (isset($_GET['filter-post']) && $_GET['filter-post']!='Все'){
             $query .= " AND post = '".$_GET['filter-post']."'";
