@@ -94,12 +94,6 @@ html, body{
     top:0;
     right:0;
 }
-.fact{
-    background-color: lime;
-}
-.nonfact{
-    background-color: red;
-}
 .plan{
     right:11px;
     background-color: rgb(81, 166, 245);
