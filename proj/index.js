@@ -14,7 +14,7 @@ const { Op } = require('sequelize')
 const {QueryTypes} = require('sequelize')
 const cron = require('node-cron')
 const { query } = require('./db')
-const webAppUrl = 'https://6de9-109-198-99-138.eu.ngrok.io/'
+const webAppUrl = 'https://db5a-109-198-99-138.eu.ngrok.io'
 const {format, intervalToDuration} = require('date-fns')
 const { default: getDay } = require('date-fns/getDay')
 
@@ -28,7 +28,7 @@ let reply1 = new Map()
 let reply2 = new Map()
 let reply3 = new Map()  
 let reply4 = new Map()
-
+let reply5 = new Map()
 
 const morning = {
     reply_markup: {
@@ -78,6 +78,21 @@ const timess = {
             [{
                 text: 'Полный рабочий день',
                 callback_data: 'Полный рабочий день'
+            },{
+                text: 'Ввести часы работы',
+                web_app:{url: webAppUrl+'clock.php?date='}
+                
+            }]
+        ]
+    }
+}
+
+const last_timess = {
+    reply_markup: {               
+        inline_keyboard: [
+            [{
+                text: 'Полный рабочий день',
+                callback_data: 'Полный рабочий день вчера'
             },{
                 text: 'Ввести часы работы',
                 web_app:{url: webAppUrl+'clock.php?date='}
@@ -274,7 +289,7 @@ bot.on('callback_query', (query) =>{
             )     
         })
     }
-    else if (query.data === 'Ввести факт'){  
+    else if ((query.data === 'Ввести факт') || query.data === 'За сегодня'){  
         bot.sendMessage(query.message.chat.id, 'Жду', {
             reply_markup: JSON.stringify({ force_reply: true }),
         }).then(msg => { 
@@ -335,6 +350,52 @@ bot.on('callback_query', (query) =>{
         });
         bot.sendMessage(query.message.chat.id, 'ok',);        
     }
+    else if (query.data === 'За вчера'){  
+        bot.sendMessage(query.message.chat.id, 'Жду', {
+            reply_markup: JSON.stringify({ force_reply: true }),
+        }).then(msg => { 
+            bot.removeReplyListener(reply5.get(query.message.chat.id)); 
+            reply5.set(query.message.chat.id,
+                bot.onReplyToMessage(msg.chat.id, msg.message_id, async reply => {
+                    sequelize.query(
+                        `UPDATE reports SET fact = $2, worked = 'Y' WHERE chat_id = $1 AND "ID" = (
+                          SELECT "ID" FROM reports WHERE chat_id = $1 ORDER BY created_at DESC LIMIT 1 OFFSET 1
+                        )`, {
+                        bind:[reply.chat.id,reply.text],
+                        model: reports,
+                        mapToModel: true,
+                        type: Op.UPDATE,
+                    });
+                    const mes = await bot.sendMessage(query.message.chat.id, 'У тебы был полный рабочий день?', last_timess);
+                    await bot.editMessageReplyMarkup({               
+                        inline_keyboard: [
+                            [{
+                                text: 'Полный рабочий день',
+                                callback_data: 'Полный рабочий день вчера'
+                            },{
+                                text: 'Ввести часы работы',
+                                web_app:{url: webAppUrl+'clock.php?date='+format(new Date(),'yyyy-MM-dd')+'&message_id='+(mes.message_id)}
+                                
+                            }]
+                        ]
+                    }, {chat_id: mes.chat.id, message_id: mes.message_id});
+                    bot.removeReplyListener(reply5.get(query.message.chat.id));
+                    reply5.delete(query.message.chat.id);
+                })
+            )
+        })                             
+    }
+    else if(query.data === 'Полный рабочий день вчера'){  
+        sequelize.query(`UPDATE reports SET hours = '8' WHERE chat_id= $1 AND "ID" = (
+            SELECT "ID" FROM reports WHERE chat_id = $1 ORDER BY created_at DESC LIMIT 1 OFFSET 1
+          )`, {
+            bind:[query.message.chat.id],
+            model: reports,
+            mapToModel: true,
+            type: Op.SELECT,
+        });
+        bot.sendMessage(query.message.chat.id, 'ok',);        
+    }
     bot.editMessageReplyMarkup({reply_markup: JSON.stringify({keyboard: []})}, {chat_id: query.message.chat.id, message_id: query.message.message_id});
 })
 //Ввод плана командой
@@ -358,31 +419,95 @@ bot.onText(/\/workstart/, async msg => {
         bot.sendMessage(msg.chat.id, 'Кто работа?');
     }
 }) 
-//Ввод факта командой
+
+// //Ввод факта командой
+
 bot.onText(/\/workend/, async msg => {
-    if(new Date().getDay() != (6 || 0)){
-        await sequelize.query("INSERT INTO reports(date, chat_id, worked) SELECT $1, $2, 'N' WHERE NOT EXISTS (SELECT * FROM reports WHERE date = $1 AND chat_id = $2) AND EXISTS (SELECT * FROM personals WHERE chat_id = $2 AND active = 'Y')", {
-            bind:[format(new Date(),'yyyy-MM-dd'),msg.chat.id],
-            model: reports,   
-            mapToModel: true,
-            type: Op.SELECT,
-        });
-        await reports.findOne({where:{chat_id: msg.chat.id, date: format(new Date(),'yyyy-MM-dd')}, raw: true })
-        .then(user=>{
-            if (user && user.fact == null){
-                bot.sendMessage(user.chat_id, 'Готов отчитаться за день?', evening);
-            } else {
-                bot.sendMessage(msg.chat.id, 'Не понял');
-            }
-        }).catch(err=> console.log(err));
-    } else {
-        bot.sendMessage(msg.chat.id, 'Кто работа?');
+  if (new Date().getDay() != (6 || 0)) {
+    const [instance, created] = await reports.findOrCreate({
+      where: { chat_id: msg.chat.id, date: format(new Date(), 'yyyy-MM-dd') },
+      defaults: { worked: 'N' }
+    });
+const prevEntry = await reports.findOne({
+        where: { chat_id: msg.chat.id },
+        order: [['created_at', 'DESC']],
+        offset: 1,
+        limit: 1
+      });
+      const last_evening = {
+        reply_markup: {
+            inline_keyboard: [
+                [{
+                    text: 'За вчера',
+                    callback_data: 'За вчера'
+                },{
+                    text: 'За сегодня',
+                    callback_data: 'За сегодня'
+                }]
+            ]
+        }
     }
-}) 
+
+
+    if ((prevEntry && prevEntry.fact === null)&&(created || instance.fact === null)) {
+        bot.sendMessage(msg.chat.id, 'Вы не заполнили факт за предыдущий рабочий день. Какой факт хотите заполнить?', last_evening);
+      } 
+
+     else {
+      if (created || instance.fact === null) {
+      bot.sendMessage(msg.chat.id, 'Готов отчитаться за день?', evening);
+
+    }
+
+      
+      
+      
+      else {
+        bot.sendMessage(msg.chat.id, 'Не понял');
+      }
+    }
+  } else {
+    bot.sendMessage(msg.chat.id, 'Кто работа?');
+  }
+});
+
+
+
+
+// bot.onText(/\/workend/, async msg => {
+//     if (new Date().getDay() != (6 || 0)) {
+//       const [instance, created] = await reports.findOrCreate({
+//         where: { chat_id: msg.chat.id, date: format(new Date(), 'yyyy-MM-dd') },
+//         defaults: { worked: 'N' }
+//       });
+  
+//       if (created || instance.fact === null) {
+//         bot.sendMessage(msg.chat.id, 'Готов отчитаться за день?', evening);
+//       } else {
+//         const prevEntry = await reports.findOne({
+//           where: { chat_id: msg.chat.id },
+//           order: [['created_at', 'DESC']],
+//           offset: 1,
+//           limit: 1
+//         });
+        
+//         if (prevEntry && prevEntry.fact === null) {
+//           bot.sendMessage(msg.chat.id, 'Вы не заполнили факт в предыдущей записи. Хотите его заполнить?');
+//         } else {
+//           bot.sendMessage(msg.chat.id, 'Не понял');
+//         }
+//       }
+//     } else {
+//       bot.sendMessage(msg.chat.id, 'Кто работа?');
+//     }
+//   });
 
 
 //Тут я кароче закончил что-то делать, спокойной ночи
-
+// await reports.findOne({where:{chat_id: msg.chat.id,
+//     created_at: {[Op.lt]: currentRecord.created_at}},
+//     date: format(new Date(),'yyyy-MM-dd'),
+//     order: [['created_at', 'DESC']], raw: true })
 //Блок авторизации
 bot.onText(/\/start/, msg => {
     const chatId = msg.chat.id;
@@ -589,8 +714,6 @@ bot.onText(/\/start/, msg => {
 
 bot.onText(/\/employes/, async (msg) => {
     const { chat: { id }, from: { id: userId } } = msg;
-  
-    // Check if user has access level of 1 or higher
     const user = await personal.findOne({ where: { chat_id: userId } });
     if (!user || user.access_level <= 1) {
       return bot.sendMessage(id, 'У вас нет доступа к этой команде');
@@ -619,7 +742,6 @@ bot.onText(/\/employes/, async (msg) => {
     } 
   
     const employeeList = employees.map(emp => `${emp.full_name} (${emp.post})`).join('\n'); 
-  
     const message = `Твоя команда:\n${employeeList}`;
   
     bot.sendMessage(id, message); 
