@@ -16,7 +16,10 @@ include 'php.php';
   <link rel="stylesheet" href="styles.css">
 </head>
 <?php
-  access($connection);
+  if (isset($_SESSION['auth'])) {
+    access($connection);
+  }
+  $authimg = '';
   if(empty($_SESSION['auth'])){
     $authimg='authimg';
   }
@@ -108,7 +111,7 @@ include 'php.php';
                 <select class="form-select filter-select filters" name="filter-post" id="filter-post">
                   <option value="Все">Все</option>
                   <?php
-                    $sql = "SELECT post FROM personals WHERE post != '' AND access_level<".access($connection)." GROUP BY post";
+                    $sql = "SELECT post FROM personals WHERE post != '' AND access_level<".access($connection)." AND active != 'N' OR number_phone = '".$_SESSION['auth']."' GROUP BY post";
                     $res = pg_query($connection, $sql) or die("wait what\n");
                     while ($combobox = pg_fetch_array($res)) {
                     ?>
@@ -156,7 +159,7 @@ include 'php.php';
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" id="edit">
-        <form onsubmit="return false;"  class="row gy-2 gx-3 align-items-center text-center" name="button-save" id="form_edit">
+        <form onsubmit="return false;"  class="row gy-2 gx-3 align-items-center text-center formsql" name="button-save" id="form_edit">
         </form>
       </div>
     </div>
@@ -171,7 +174,7 @@ include 'php.php';
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form onsubmit="return false;" class="row gy-2 gx-3 align-items-center text-center" name="button-add">
+        <form onsubmit="return false;" class="row gy-2 gx-3 align-items-center text-center formsql" name="button-add">
           <input type="hidden" name="button-form" value="button-add">
           <div class="col-auto mx-auto">
             <label for="number_phone">Номер телефона</label>

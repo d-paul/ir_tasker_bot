@@ -3,7 +3,7 @@
     include "php.php";
     session_start();
     if(!empty($_SESSION['auth'])) {
-        $query = "SELECT * FROM personals WHERE number_phone = '".$_SESSION['auth']."' OR access_level<".access($connection);
+        $query = "SELECT * FROM personals WHERE (number_phone = '".$_SESSION['auth']."' OR access_level<".access($connection).")";
         if (isset($_GET['filter-post']) && $_GET['filter-post']!='Все'){
             $query .= " AND post = '".$_GET['filter-post']."'";
         }
@@ -37,7 +37,7 @@
             else{
                 $NonActive='';
             }
-            if ($row[0]==$_GET['selected']){
+            if (isset($_GET['selected']) && $row[0]==$_GET['selected']){
                 $selected='row_selected';
             }
             else{

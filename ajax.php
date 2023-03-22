@@ -3,7 +3,7 @@ include 'db.php';
 include 'php.php';
 include 'token.php';
 //...........Добавление сотрудника...............
-if ($_GET['button-form'] == 'button-add'){
+if (isset($_GET['button-form']) && $_GET['button-form'] == 'button-add'){
   $add_date_birth = $_GET['add_date_birth'];
   $add_number_phone = '7'.pg_escape_string($_GET['add_number_phone']);
   $add_full_name = pg_escape_string($_GET['add_full_name']);
@@ -32,10 +32,11 @@ if ($_GET['button-form'] == 'button-add'){
 }
 
 //.............Редактирование сотрудника.............
-if ($_GET['button-form'] == 'button-save'){
+if (isset($_GET['button-form']) && $_GET['button-form'] == 'button-save'){
   $date_birth = $_GET['date_birth'];
   $full_name = pg_escape_string($_GET['full_name']);
   $post = pg_escape_string($_GET['post']);
+  $number_phone = mb_substr($_GET['number_phone'],1,11);
   if (isset($_GET['active']) && $_GET['active']=='Y'){
     $active='Y';
   }
@@ -48,7 +49,7 @@ if ($_GET['button-form'] == 'button-save'){
   else {
     $date_birth = "'$date_birth'";
   }
-  $sql ="UPDATE personals SET date_birth=".$date_birth.", full_name='".$full_name."', post='".$post."', team='".$_GET['team']."', access_level='".$_GET['access_level']."', active='".$active."' WHERE number_phone = '".$_GET['number_phone']."'";
+  $sql ="UPDATE personals SET date_birth=".$date_birth.", full_name='".$full_name."', post='".$post."', team='".$_GET['team']."', access_level='".$_GET['access_level']."', active='".$active."' WHERE number_phone = '".$number_phone."'";
   pg_query($connection, $sql);
   echo "table_update(); $('#Modal').modal('hide');";
 }
