@@ -170,3 +170,28 @@ const report_aprove = sequelize.define('report_aprove',
 {freezeTableName: true}
 )
 module.exports.report_aprove = report_aprove;
+
+const vacation_aprove = sequelize.define('vacation_aprove',
+{
+    id:{
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
+    },
+    chat_id:{
+        type: DataTypes.BIGINT
+    },
+    start:{
+        type: DataTypes.DATEONLY
+    },
+    end:{
+        type: DataTypes.DATEONLY
+    },
+    status:{
+        type: DataTypes.CHAR
+    }
+},
+{freezeTableName: true}
+)
+module.exports.vacation_aprove = vacation_aprove;
