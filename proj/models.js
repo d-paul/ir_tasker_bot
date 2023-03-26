@@ -42,6 +42,9 @@ const personal = sequelize.define('personal',
         type: DataTypes.BIGINT,
         
     },
+    working:{
+        type: DataTypes.CHAR(1),
+    },
 },
 
 )
