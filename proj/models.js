@@ -45,6 +45,10 @@ const personal = sequelize.define('personal',
     working:{
         type: DataTypes.CHAR(1),
     },
+    time_for_work:{
+        type: DataTypes.CHAR,
+        defaultValue: 0
+    }
 },
 
 )
@@ -74,9 +78,11 @@ const reports = sequelize.define('reports',
         type: DataTypes.CHAR()
     },
     chat_id:{
-        type: DataTypes.BIGINT,
-        
+        type: DataTypes.BIGINT,    
     },
+    time_for_work:{
+        type: DataTypes.CHAR
+    }
 
 },
 {freezeTableName: true},
@@ -198,3 +204,28 @@ const vacation_aprove = sequelize.define('vacation_aprove',
 {freezeTableName: true}
 )
 module.exports.vacation_aprove = vacation_aprove;
+
+const not_working = sequelize.define('not_working',
+{
+    id:{
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
+    },
+    chat_id:{
+        type: DataTypes.BIGINT
+    },
+    start:{
+        type: DataTypes.DATEONLY
+    },
+    end:{
+        type: DataTypes.DATEONLY
+    },
+    status:{
+        type: DataTypes.CHAR
+    }
+},
+{freezeTableName: true}
+)
+module.exports.not_working = not_working;
