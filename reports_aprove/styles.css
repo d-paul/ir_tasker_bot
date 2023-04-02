@@ -1,0 +1,21 @@
+.text-start{
+    padding-left:0;
+    float:left;
+}
+.text-end{
+    padding-right:0;
+    float:right;
+}
+textarea{
+    margin-bottom: 10px;
+    resize:none;
+    height:150px;
+}
+.day{
+    margin-bottom: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.date{
+    border-bottom: 1px solid black;
+}
