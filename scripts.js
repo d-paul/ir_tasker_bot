@@ -86,7 +86,7 @@ function table_update(){
   });
 }
 
-//Фильтры
+//Фильтр
 $(document).on('change', '.filters', function () {
     table_update();
   });
