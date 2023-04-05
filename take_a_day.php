@@ -9,10 +9,6 @@
   <link rel="stylesheet" href="take_a_day/styles.css">
 </head>
 <body>
-  <?php
-  include 'webapp.php';
-  echo $webAppUrl;
-  ?>
   <div class="container h-100 d-flex justify-content-center">
     <div class="d-flex flex-column text-center" id="tgonly">
     </div>
