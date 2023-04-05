@@ -1,4 +1,4 @@
 <?php
-$webAppUrl = 'https://402c-109-198-99-138.eu.ngrok.io';
-$approve = '383597015';f
+$webAppUrl = ((!empty($_SERVER['HTTPS'])) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+$approve = '881159937';
 ?>
