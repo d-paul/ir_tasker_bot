@@ -5,7 +5,7 @@ $(document).ready(function(){
         $.ajax({
             type: "POST",
             url: 'weekly_report/ajax.php',
-            data: {chatid: 1009006231},//tg.initDataUnsafe.user.id},
+            data: {chatid: tg.initDataUnsafe.user.id},
             success: function (data) {
               eval(data);
             }
