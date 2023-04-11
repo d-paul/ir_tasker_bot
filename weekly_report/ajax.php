@@ -43,9 +43,17 @@ if (isset($_POST['chatid']) && !isset($_POST['time_work'])) {
                 <label class='fs-5'>Факт</label>
                 <textarea class='form-control fs-6 fact' type='text'>".$row[1]."</textarea>
             </div>
-            <div class='row row_time_work' date='".$row[3]."' ".($check = ($row[5] == 'Y') ? "" : "style='display:none;'").">
+            <div class='row row_time_work' date='".$row[3]."' ".($check = ($row[5] == 'Y') ? '' : 'style="display:none;"').">
                 <label class='fs-5 time_work' date='".$row[3]."' hours='".$row[2]."' time_work='".$row[4]."' style='width:50%'>".$row[4]." (".$row[2].")</label>
                 <button type='button' style='width:50%' class='btn btn-primary but_time_work'>Выбрать время</button>
+            </div>
+            <div class='row row_not_work' date='".$row[3]."' ".($check = ($row[5] != 'Y') ? '' : 'style="display:none;"').">
+                <select class='form-select filter-select filters' name='filter-post' id='filter-post'>
+                <option value='N' ".($select = ($row[5] == 'N') ? 'selected' : '').">Не работал</option>
+                <option value='D' ".($select = ($row[5] == 'D') ? 'selected' : '').">Взял день</option>
+                <option value='S' ".($select = ($row[5] == 'S') ? 'selected' : '').">Болел</option>
+                <option value='V' ".($select = ($row[5] == 'V') ? 'selected' : '').">Отпуск</option>
+                </select>
             </div>
             <div class='row'>
                 <label class='fs-5' style='width:100px;'>Работал?</label>

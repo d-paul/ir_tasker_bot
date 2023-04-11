@@ -51,7 +51,7 @@ if (isset($_POST['chatid']) && isset($_POST['id']) && !isset($_POST['aprove']) &
                 $dates = $dates."date = '".$date[4]."' OR ";
             }
             $dates = $dates."1 != 1";
-            $sql = "SELECT tasks, fact, hours, date, time_work FROM reports WHERE chat_id = '".$chatid."' AND (".$dates.") ORDER BY date";
+            $sql = "SELECT tasks, fact, hours, date, time_work, worked FROM reports WHERE chat_id = '".$chatid."' AND (".$dates.") ORDER BY date";
             $res = pg_query($connection, $sql);
             $worked = array_diff($worked, array(null));
             $time_work = array_diff($time_work, array(null));
@@ -73,12 +73,12 @@ if (isset($_POST['chatid']) && isset($_POST['id']) && !isset($_POST['aprove']) &
                         <div class='col old' style='padding:0 4px;'>
                             <label class='fs-5'>old</label>
                             <textarea class='form-control fs-6' type='text'>".$row[1]."</textarea>
-                            <label class='fs-5'>".$row[4]." (".($work = ($row[2] == 0) ? 'Не работал' : $row[2]).")</label>
+                            <label class='fs-5'>".$row[4]." (".($work = ($row[5] == 'Y') ? $row[2] : (($row[5] == 'N') ? 'Не работал' : (($row[5] == 'V') ? 'Отпуск' : 'Взял день'))).")</label>
                         </div>
                         <div class='col new' style='padding:0 4px;'>
                             <label class='fs-5'>new</label>
                             <textarea class='form-control fs-6' type='text'>".$fact[$n]."</textarea>
-                            <label class='fs-5 '>".$time_work[$n]." (".($work = ($hours[$n] == 0) ? 'Не работал' : $hours[$n]).")</label>
+                            <label class='fs-5 '>".$time_work[$n]." (".($work = ($worked[$n] == 'Y') ? $hours[$n] : (($worked[$n] == 'N') ? 'Не работал' : (($worked[$n] == 'V') ? 'Отпуск' : 'Взял день'))).")</label>
                         </div>
                     </div>
                 </div>`);");

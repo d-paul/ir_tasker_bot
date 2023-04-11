@@ -35,9 +35,9 @@ tg.MainButton.onClick(() => {
                 time_work.push($(this).find('.time_work').attr('time_work'));
                 hours.push($(this).find('.time_work').attr('hours'));
             } else {
-                worked.push('N');
                 time_work.push(null);
                 hours.push(0);
+                worked.push($(this).find('.row_not_work').find('select').val());
             }
         })
         $.ajax({
@@ -167,10 +167,12 @@ clock.fill();
 $(document).on('change', '.worked', function () {
     if (this.checked!=true){
         $(`.row_time_work[date='${$(this).closest('.day').attr('date')}']`).hide();
+        $(`.row_not_work[date='${$(this).closest('.day').attr('date')}']`).show();
     } else {
         $(`.row_time_work[date='${$(this).closest('.day').attr('date')}']`).show();
         $(`.row_time_work[date='${$(this).closest('.day').attr('date')}']`).find('.time_work').text('(8)');
         $(`.row_time_work[date='${$(this).closest('.day').attr('date')}']`).find('.time_work').attr('hours',8);
+        $(`.row_not_work[date='${$(this).closest('.day').attr('date')}']`).hide();
     }
   });
 
