@@ -45,7 +45,7 @@ $(document).on('click', '#clock', function(event) {
             hours = (hours >= 7) ? (hours - 1) : hours;
             if (hours > 7) {
                 hours = 7;
-                end = start+7;
+                end = start+8;
             }
             if ((end-start) > 0) {
                 for (let i = start; i < end; ++i) {
@@ -55,7 +55,7 @@ $(document).on('click', '#clock', function(event) {
             circleSelect(end, true);
             end = (end > 18) ? (end - 24) : end;
             tg.MainButton.show();
-            tg.MainButton.text = 'Работал с '+(start+5)+':00 до '+(end+6)+':00 ('+hours+')';
+            tg.MainButton.text = 'Работал с '+(start+5)+':00 до '+(end+5)+':00 ('+hours+')';
             one = true;
         }
     }
@@ -157,7 +157,7 @@ function get(name){
         hours = (hours >= 7) ? (hours - 1) : hours;
         if (hours > 7) {
             hours = 7;
-            end = start+7;
+            end = start+8;
         }
         circleSelect(end, false);
         if ((end-start) > 0) {

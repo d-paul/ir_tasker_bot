@@ -84,7 +84,6 @@ if (isset($_POST['time_work'])) {
         }
     }
     $sql=$sql.") RETURNING id";
-    pg_query($connection, $sql);
     $res = pg_query($connection, $sql);
     $id;
     while ($row = pg_fetch_array($res)) {
