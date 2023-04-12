@@ -30,12 +30,12 @@ $(document).on('click', '#clock', function(event) {
             select = true;
             clear();
             start = part;
-            selection (start, 0.3);
+            circleSelect(start, true);
             tg.MainButton.show();
             tg.MainButton.text = 'Работал с '+(start+5)+':00 до ... ()';
             one = false;
         }
-        else {
+        else if (part != start){
             select = false;
             end = part;
             if (end < start) {
@@ -47,12 +47,12 @@ $(document).on('click', '#clock', function(event) {
                 hours = 7;
                 end = start+7;
             }
-            if ((end-start) > 1) {
-                for (let i = start+1; i < end; ++i) {
-                    selection (i, 0.2);
+            if ((end-start) > 0) {
+                for (let i = start; i < end; ++i) {
+                    selection (i);
                 }
             }
-            selection (end, 0.3);
+            circleSelect(end, true);
             end = (end > 18) ? (end - 24) : end;
             tg.MainButton.show();
             tg.MainButton.text = 'Работал с '+(start+5)+':00 до '+(end+6)+':00 ('+hours+')';
@@ -114,12 +114,12 @@ function clear() {
     clock.restore();
 }
 
-function selection(part, v) {
-    clock.fillStyle = `rgba(0, 214, 21, ${v})`;
-    clock.strokeStyle = "rgba(0,0,0,0)";
+function selection(part) {
+    clock.fillStyle = `rgba(0, 0, 0, 0)`;
+    clock.lineWidth = 6;
+    clock.strokeStyle = "rgba(143, 20, 20, 0.7)";
     clock.beginPath();
-    clock.arc(size/2,size/2,size/2,Math.PI/6*Math.abs(part+3),Math.PI/6*(Math.abs(part-1+3)),true);
-    clock.lineTo(size/2,size/2);
+    clock.arc(size/2,size/2,size/2.05,Math.PI/6*Math.abs(part+3),Math.PI/6*(Math.abs(part-1+3)),true);
     clock.stroke();
     clock.closePath();
     clock.fill();
@@ -142,4 +142,117 @@ tg.MainButton.onClick(() => {
 function get(name){
     if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
        return decodeURIComponent(name[1]);
+ }
+
+ $(document).on('mousemove', '#clock', function(event) {
+    const part = selected_part(event);
+    if (select) {      
+        clear();
+        circleSelect(start, true);
+        end = part;
+        if (end < start) {
+            end += 12;
+        }
+        hours = end - start + 1;
+        hours = (hours >= 7) ? (hours - 1) : hours;
+        if (hours > 7) {
+            hours = 7;
+            end = start+7;
+        }
+        circleSelect(end, false);
+        if ((end-start) > 0) {
+            for (let i = start; i < end; ++i) {
+                selection (i);
+            }
+        }
+    } else {
+        clear();
+        circleSelect(start, true);
+        circleSelect(end, true);
+        circleSelect(part, false);
+        if ((end-start) > 0) {
+            for (let i = start; i < end; ++i) {
+                selection (i);
+            }
+        }
+    }
+ })
+
+function circleSelect(part, sw) {
+    const circle = circleXY(part);
+    clock.fillStyle = `rgba(72, 209, 204, 0.3`;
+    if (sw) {
+        clock.lineWidth = 5;
+        clock.strokeStyle = "rgba(19, 56, 55, 0.8)";
+    } else {
+        clock.strokeStyle = "rgba(0,0,0,0)";
+    }
+    clock.beginPath();
+    clock.arc(circle.X,circle.Y,size/12,0,2*Math.PI,true);
+    clock.stroke();
+    clock.closePath();
+    clock.fill();
+}
+
+ function circleXY(part) {
+    let x, y;
+    part = part > 12 ? part - 12 : part;
+    switch (part) {
+        case 1:
+            x = size/1.972;
+            y = size/1.119;
+            break;
+        case 2:
+            x = size/3.32;
+            y = size/1.19;
+            break;
+        case 3:
+            x = size/5.8;
+            y = size/1.41;
+            break;
+        case 4:
+            x = size/8.34;
+            y = size/2.03;
+            break;
+        case 5:
+            x = size/6;
+            y = size/3.5;
+            break;
+        case 6:
+            x = size/3.27;
+            y = size/6.4;
+            break;
+        case 7:
+            x = size/1.96;
+            y = size/9.8;
+            break;
+        case 8:
+            x = size/1.455;
+            y = size/6.44;
+            break;
+        case 9:
+            x = size/1.2;
+            y = size/3.55;
+            break;
+        case 10:
+            x = size/1.135;
+            y = size/2.03;
+            break;
+        case 11:
+            x = size/1.22;
+            y = size/1.4;
+            break;
+        case 12:
+            x = size/1.425;
+            y = size/1.19;
+            break;
+    }
+    return new circle(x,y);
+ }
+ 
+ class circle {
+    constructor(X, Y) {
+        this.X = X;
+        this.Y = Y;
+    }
  }
