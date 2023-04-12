@@ -41,7 +41,7 @@ $(document).on('click', '#clock', function(event) {
             if (end < start) {
                 end += 12;
             }
-            hours = end - start + 1;
+            hours = end - start;
             hours = (hours >= 7) ? (hours - 1) : hours;
             if (hours > 7) {
                 hours = 7;
@@ -67,34 +67,42 @@ function selected_part(event) {
     const y = event.clientY - rect.top;
     const angle = Math.abs(Math.asin((y-size/2)/Math.sqrt(Math.pow(x-size/2,2)+Math.pow(y-size/2,2)))*180/Math.PI);
     let part;
-    if (x < size/2 && y < size/2) {
-        if (angle <= 30) {
+    if (x <= size/2 && y <= size/2) {
+        if (angle <= 15) {
             part = 4;
-        } else if (angle <= 60) {
+        } else if (angle <= 45) {
             part = 5;
-        } else {
+        } else if (angle <= 75) {
             part = 6;
+        } else {
+            part = 7;
         }
-    } else if (x > size/2 && y < size/2) {
-        if (angle <= 30) {
+    } else if (x >= size/2 && y <= size/2) {
+        if (angle <= 15) {
+            part = 10;
+        } else if (angle <= 45) {
             part = 9;
-        } else if (angle <= 60) {
+        } else if (angle <= 75) {
             part = 8;
         } else {
             part = 7;
         }
     } else if (x > size/2 && y > size/2) {
-        if (angle <= 30) {
+        if (angle <= 15) {
             part = 10;
-        } else if (angle <= 60) {
+        } else if (angle <= 45) {
             part = 11;
-        } else {
+        } else if (angle <= 75) {
             part = 12;
+        } else {
+            part = 1;
         }
     } else {
-        if (angle <=30) {
+        if (angle <=15) {
+            part = 4;
+        } else if (angle <= 45) {
             part = 3;
-        } else if (angle <= 60) {
+        } else if (angle <= 75) {
             part = 2;
         } else {
             part = 1;
@@ -131,7 +139,7 @@ tg.MainButton.onClick(() => {
         $.ajax({
             type: "POST",
             url: 'clock/ajax.php',
-            data: {date: get('date'), start: start+8, end: end+9, hours: hours, chatid: tg.initDataUnsafe.user.id, message_id: get('message_id')},
+            data: {date: get('date'), start: start+5, end: end+5, hours: hours, chatid: tg.initDataUnsafe.user.id, message_id: get('message_id')},
             success: function () {
                 tg.close();
             }
