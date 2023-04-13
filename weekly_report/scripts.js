@@ -72,8 +72,6 @@ $(document).on('click', '#clock', function(event) {
             clear();
             start = part;
             circleSelect(start, true);
-            tg.MainButton.show();
-            tg.MainButton.text = 'Работал с '+(start+5)+':00 до ... ()';
             one = false;
         }
         else if (part != start){
