@@ -105,7 +105,7 @@ if (isset($_POST['time_work'])) {
             'inline_keyboard' => array(
                 array(
                     array(
-                        'text' => 'Посмотреть '.$webAppUrl.'/reports_aprove.php?id='.$id,
+                        'text' => 'Посмотреть',
                         'web_app' => array('url' => $webAppUrl.'/reports_aprove.php?id='.$id),
                     ),
                 )

@@ -7,6 +7,7 @@ $(document).ready(function(){
             url: 'reports_aprove/ajax.php',
             data: {chatid: tg.initDataUnsafe.user.id, id: get('id')},
             success: function (data) {
+              alert(data);
               eval(data);
             }
         });
