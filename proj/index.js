@@ -327,7 +327,7 @@ cron.schedule('55 17 * * 1-5', () =>{
         user.forEach(item => 
            { current_task.findOne({where:{ chat_id: item.chat_id}, raw: true })
                 .then(async user=>{
-                 if (!user.tasks.join('\n')) { 
+                 if (!user || !user.tasks.join('\n')) { 
                   return  bot.sendMessage(item.chat_id, 'Готов отчитаться за день?',evening);  
                 }    
                 else{
@@ -336,7 +336,7 @@ cron.schedule('55 17 * * 1-5', () =>{
                 }                
                 
                 }).catch(err=>console.log(err));
-            bot.sendMessage(item.chat_id, 'Готов отчитаться за день?', evening)}
+        }
             );
     }).catch(err=>console.log(err));
 })
@@ -356,7 +356,7 @@ cron.schedule('55 18 * * 1-5', () =>{
         user.forEach(item => 
            { current_task.findOne({where:{ chat_id: item.chat_id}, raw: true })
                 .then(async user=>{
-                 if (!user.tasks.join('\n')) { 
+                 if (!user || !user.tasks.join('\n')) { 
                   return  bot.sendMessage(item.chat_id, 'Готов отчитаться за день?',evening);  
                 }    
                 else{
@@ -365,7 +365,7 @@ cron.schedule('55 18 * * 1-5', () =>{
                 }                
                 
                 }).catch(err=>console.log(err));
-            bot.sendMessage(item.chat_id, 'Готов отчитаться за день?', evening)}
+        }
             );
     }).catch(err=>console.log(err));
 })
@@ -385,7 +385,7 @@ cron.schedule('55 16 * * 1-5', () =>{
         user.forEach(item => 
            { current_task.findOne({where:{ chat_id: item.chat_id}, raw: true })
                 .then(async user=>{
-                 if (!user.tasks.join('\n')) { 
+                 if (!user || !user.tasks.join('\n')) { 
                   return  bot.sendMessage(item.chat_id, 'Готов отчитаться за день?',evening);  
                 }    
                 else{
@@ -394,7 +394,7 @@ cron.schedule('55 16 * * 1-5', () =>{
                 }                
                 
                 }).catch(err=>console.log(err));
-            bot.sendMessage(item.chat_id, 'Готов отчитаться за день?', evening)}
+        }
             );
     }).catch(err=>console.log(err));
 })
@@ -553,7 +553,7 @@ bot.on('callback_query', (query) =>{
     }
     else if(query.data === 'day_!aprove') { (async function vacation(text, id) {
         const vacation_id = await text.match(/\[#(.*)\]/)[1];
-        bot.sendMessage(id, 'Заявка тклонена',);
+        bot.sendMessage(id, 'Заявка отклонена',);
         await vacation_aprove.findOne({where:{id: vacation_id}, raw: true })
         .then(vacation => {
             bot.sendMessage(vacation.chat_id, 'Заявка на день/дни без содержания с '+vacation.start+' по '+vacation.end+' была отклонена');
@@ -678,7 +678,8 @@ bot.onText(/\/workstart/, async msg => {
               if (created || instance.fact === null) {
                 current_task.findOne({where:{ chat_id: msg.chat.id}, raw: true })
                 .then(async user=>{
-                 if (!user.tasks.join('\n')) { 
+                 if (!user || !user.tasks.join('\n')) { 
+                    
                   return  bot.sendMessage(msg.chat.id, 'Готов отчитаться за день?',evening);  
                 }    
                 else{
