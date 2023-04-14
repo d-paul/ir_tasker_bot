@@ -23,7 +23,7 @@ const personal = sequelize.define('personal',
         
     },
     team:{
-        type: DataTypes.CHAR(100),
+        type: DataTypes.ARRAY(DataTypes.STRING),
         
     },
     access_level:{
@@ -229,3 +229,18 @@ const not_working = sequelize.define('not_working',
 {freezeTableName: true}
 )
 module.exports.not_working = not_working;
+
+const current_task = sequelize.define('current_task',
+{
+    chat_id:{
+        type: DataTypes.BIGINT,
+        primaryKey: true,
+    },
+    tasks:{
+        type: DataTypes.ARRAY(DataTypes.STRING)
+    },
+    
+},
+{freezeTableName: true}
+)
+module.exports.current_task = current_task;

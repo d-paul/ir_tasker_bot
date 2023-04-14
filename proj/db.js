@@ -17,7 +17,7 @@ client.query('SELECT * from personal', (err,res)=>{
 const {Sequelize} = require('sequelize');
 
 module.exports = new Sequelize(
-    'postgres://grimksi:4QbYXDPrdy9k@ep-wispy-heart-761564.eu-central-1.aws.neon.tech/testdb?ssl=true',
+    'postgres://grimksi:4QbYXDPrdy9k@ep-wispy-heart-761564.eu-central-1.aws.neon.tech/neondb?ssl=true',
     {
         host:'ep-wispy-heart-761564.eu-central-1.aws.neon.tech',
         port: '5432',
