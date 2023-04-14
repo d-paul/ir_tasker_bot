@@ -72,7 +72,6 @@ $(document).on('click', '#clock', function(event) {
             clear();
             start = part;
             circleSelect(start, true);
-            one = false;
         }
         else if (part != start){
             select = false;
