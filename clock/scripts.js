@@ -133,9 +133,10 @@ function selection(part) {
     clock.fill();
 }
 
+let oneclick = true;
 tg.MainButton.onClick(() => {
-    if (one) {
-        one = false;
+    if (oneclick) {
+        oneclick = false;
         $.ajax({
             type: "POST",
             url: 'clock/ajax.php',
